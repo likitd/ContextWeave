@@ -1,8 +1,8 @@
 # ContextWeave
 
-> An agentic hybrid GraphRAG system for turning your files into a searchable, grounded knowledge assistant.
-
-**Recommended repository name:** `context-weave`
+> **Your files in. Better answers out.**
+>
+> An agentic hybrid GraphRAG system that finds the right evidence across keywords, meaning, relationships, and files.
 
 The name describes the core idea: weaving together keyword search, semantic search, knowledge-graph retrieval, agentic tool use, and direct file exploration. The package name remains `hybrid-rag` for now, so existing commands continue to work.
 
