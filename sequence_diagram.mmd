@@ -1,0 +1,59 @@
+sequenceDiagram
+    participant User
+    participant Main as main.py
+    participant Pipeline as HybridRAGPipeline (rag_pipeline.py)
+    participant AgentFS as AgentFSManager (agentfs_manager.py)
+    participant Context as ContextAnalyzer (context_analysis.py)
+    participant Retriever as hybrid_retriever.py
+    participant Chroma as ChromaDB
+    participant LightRAG as lightrag_manager.py
+    participant DocLoader as document_loader.py
+    participant Ingest as ingest.py
+    participant LRIngest as lightrag_ingest.py
+    participant Output as output/
+
+    User->>Main: run()
+    Main->>Pipeline: initialize()
+    Pipeline->>AgentFS: initialize AgentFS
+    alt agentfs/auto strategy
+        Pipeline->>Context: build()/get_context_overview()
+    end
+    alt hybrid strategy
+        Pipeline->>Retriever: create_embedding_function()/load_existing_vector_store()
+        Retriever->>Chroma: load/create vector store
+    end
+    alt lightrag strategy
+        Pipeline->>LightRAG: get_lightrag()
+    end
+
+    User->>Main: submit query
+    Main->>Pipeline: query(user request)
+    Pipeline->>AgentFS: tool_start(agent_query)
+
+    alt STRATEGY == agentfs
+        Pipeline->>Context: get_graph_overview()
+        Pipeline->>LightRAG: (optional) LLM file-picker -> selected file paths
+        Pipeline->>AgentFS: read_files_in_batches(paths)
+        AgentFS->>DocLoader: read file contents
+        Pipeline->>Pipeline: sub-agent batch merge
+        Pipeline->>LLM: main LLM generation using [AGENTFS CONTEXT]
+    else STRATEGY == hybrid
+        Pipeline->>Retriever: hybrid_search(query)
+        Retriever-->>Pipeline: relevant docs
+        Pipeline->>LLM: generate answer from retrieved docs
+    else STRATEGY == lightrag
+        Pipeline->>LightRAG: lightrag_search(query)
+        LightRAG-->>Pipeline: lightrag_context
+        Pipeline->>LLM: generate answer using LightRAG context
+    end
+
+    Pipeline-->>Main: answer
+    Main->>Output: write result file (output/)
+
+    Note over Ingest, LRIngest: Indexing flows (run separately)
+    Ingest->>DocLoader: load_documents()
+    Ingest->>Retriever: create_embeddings + create_vector_store() -> ChromaDB
+    Ingest->>AgentFS: ingest_to_agentfs(documents)
+
+    LRIngest->>DocLoader: load_documents()
+    LRIngest->>LightRAG: insert_documents() -> LightRAG index

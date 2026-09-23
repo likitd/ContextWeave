@@ -1,0 +1,904 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://cherrywork.com/android-metadata.schema.json",
+  "title": "Android WorkApp MetaData Schema",
+  "description": "Schema for Android WorkApp metadata. Your output must be a single JSON object that validates against this schema (a data instance only). The root object must be the metadata with keys appId, screenId, and container. Do not output schema keywords like $schema, properties, or required.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "appId": {
+      "type": "integer",
+      "description": "Unique identifier for the application"
+    },
+    "screenId": {
+      "type": "integer",
+      "description": "Unique identifier for the screen"
+    },
+    "events": {
+      "type": "array",
+      "description": "Screen-level events (OnViewStatesCreated, etc.)",
+      "items": {
+        "$ref": "#/definitions/eventModel"
+      }
+    },
+    "container": {
+      "$ref": "#/definitions/componentModel",
+      "description": "Root container component (usually ConstraintView)"
+    }
+  },
+  "required": [
+    "appId",
+    "screenId",
+    "container"
+  ],
+  "definitions": {
+    "componentModel": {
+      "type": "object",
+      "description": "Base component model for all UI elements",
+      "additionalProperties": true,
+      "properties": {
+        "componentId": {
+          "type": "integer",
+          "description": "Unique identifier for the component"
+        },
+        "componentName": {
+          "type": "string",
+          "description": "Human-readable name for the component"
+        },
+        "componentType": {
+          "type": "string",
+          "enum": [
+            "ConstraintView",
+            "Text",
+            "Button",
+            "Card",
+            "Image",
+            "FloatingButton",
+            "Toolbar",
+            "CheckBox",
+            "Switch",
+            "List",
+            "TextBox",
+            "ProgressBar",
+            "Divider",
+            "SearchView"
+          ],
+          "description": "Type of UI component to render"
+        },
+        "config": {
+          "$ref": "#/definitions/componentConfig",
+          "description": "Configuration for styling, layout, and behavior"
+        },
+        "components": {
+          "type": "array",
+          "description": "Nested child components (recursive)",
+          "items": {
+            "$ref": "#/definitions/componentModel"
+          }
+        },
+        "events": {
+          "type": "array",
+          "description": "Event handlers for this component",
+          "items": {
+            "$ref": "#/definitions/eventModel"
+          }
+        }
+      },
+      "required": [
+        "componentId"
+      ]
+    },
+    "componentConfig": {
+      "type": "object",
+      "description": "Configuration object containing all styling, layout, and behavior properties",
+      "additionalProperties": true,
+      "properties": {
+        "width": {
+          "type": [
+            "string",
+            "integer"
+          ],
+          "description": "Width: 'match_parent', 'wrap_content', or numeric dp value",
+          "examples": [
+            "match_parent",
+            "wrap_content",
+            "200",
+            200
+          ]
+        },
+        "height": {
+          "type": [
+            "string",
+            "integer"
+          ],
+          "description": "Height: 'match_parent', 'wrap_content', '0' (constraint), or numeric dp value",
+          "examples": [
+            "match_parent",
+            "wrap_content",
+            "0",
+            160
+          ]
+        },
+        "startToParent": {
+          "type": "object",
+          "description": "Anchor start edge to parent's start",
+          "properties": {
+            "margin": {
+              "type": [
+                "string",
+                "integer"
+              ],
+              "description": "Margin in dp"
+            }
+          },
+          "additionalProperties": true
+        },
+        "endToParent": {
+          "type": "object",
+          "description": "Anchor end edge to parent's end",
+          "properties": {
+            "margin": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "topToParent": {
+          "type": "object",
+          "description": "Anchor top edge to parent's top",
+          "properties": {
+            "margin": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "bottomToParent": {
+          "type": "object",
+          "description": "Anchor bottom edge to parent's bottom",
+          "properties": {
+            "margin": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "startToEndOf": {
+          "type": "object",
+          "description": "Anchor start edge to another view's end edge",
+          "properties": {
+            "viewStateId": {
+              "type": "string",
+              "description": "Component ID to anchor to"
+            },
+            "margin": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "endToStartOf": {
+          "type": "object",
+          "description": "Anchor end edge to another view's start edge",
+          "properties": {
+            "viewStateId": {
+              "type": "string"
+            },
+            "margin": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "topToBottomOf": {
+          "type": "object",
+          "description": "Anchor top edge to another view's bottom edge",
+          "properties": {
+            "viewStateId": {
+              "type": "string"
+            },
+            "margin": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "bottomToTopOf": {
+          "type": "object",
+          "description": "Anchor bottom edge to another view's top edge",
+          "properties": {
+            "viewStateId": {
+              "type": "string"
+            },
+            "margin": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "topToTopOf": {
+          "type": "object",
+          "description": "Align top edge with another view's top edge",
+          "properties": {
+            "viewStateId": {
+              "type": "string"
+            },
+            "margin": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "bottomToBottomOf": {
+          "type": "object",
+          "description": "Align bottom edge with another view's bottom edge",
+          "properties": {
+            "viewStateId": {
+              "type": "string"
+            },
+            "margin": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "padding": {
+          "type": "object",
+          "description": "Padding for all sides or individual sides",
+          "properties": {
+            "top": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "bottom": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "left": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "right": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "margin": {
+          "type": "object",
+          "description": "Margin for all sides or individual sides",
+          "properties": {
+            "top": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "bottom": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "left": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            },
+            "right": {
+              "type": [
+                "string",
+                "integer"
+              ]
+            }
+          },
+          "additionalProperties": true
+        },
+        "cornerRadius": {
+          "type": [
+            "string",
+            "integer"
+          ],
+          "description": "Corner radius in dp (uniform for all corners)"
+        },
+        "cornerRadiusTopLeft": {
+          "type": [
+            "string",
+            "integer"
+          ],
+          "description": "Top-left corner radius in dp"
+        },
+        "cornerRadiusTopRight": {
+          "type": [
+            "string",
+            "integer"
+          ],
+          "description": "Top-right corner radius in dp"
+        },
+        "cornerRadiusBottomLeft": {
+          "type": [
+            "string",
+            "integer"
+          ],
+          "description": "Bottom-left corner radius in dp"
+        },
+        "cornerRadiusBottomRight": {
+          "type": [
+            "string",
+            "integer"
+          ],
+          "description": "Bottom-right corner radius in dp"
+        },
+        "elevation": {
+          "type": [
+            "string",
+            "integer"
+          ],
+          "description": "Elevation/shadow depth in dp"
+        },
+        "cardColor": {
+          "type": "string",
+          "description": "Background color for card components"
+        },
+        "resource": {
+          "$ref": "#/definitions/resourceConfig",
+          "description": "Resource configuration for colors, images, backgrounds"
+        },
+        "textConfig": {
+          "$ref": "#/definitions/textConfig",
+          "description": "Configuration for Text components"
+        },
+        "buttonConfig": {
+          "$ref": "#/definitions/buttonConfig",
+          "description": "Configuration for Button components"
+        },
+        "fabConfig": {
+          "$ref": "#/definitions/fabConfig",
+          "description": "Configuration for FloatingButton components"
+        },
+        "listConfig": {
+          "$ref": "#/definitions/listConfig",
+          "description": "Configuration for List/RecyclerView components"
+        },
+        "switchConfig": {
+          "$ref": "#/definitions/switchConfig",
+          "description": "Configuration for Switch components"
+        },
+        "title": {
+          "$ref": "#/definitions/titleConfig",
+          "description": "Title configuration for Toolbar"
+        },
+        "navigationIcon": {
+          "$ref": "#/definitions/navigationIconConfig",
+          "description": "Navigation icon for Toolbar"
+        },
+        "menuItems": {
+          "type": "array",
+          "description": "Menu items for Toolbar",
+          "items": {
+            "$ref": "#/definitions/menuItemConfig"
+          }
+        },
+        "color": {
+          "$ref": "#/definitions/themeColorConfig",
+          "description": "Themed color configuration for CheckBox states"
+        },
+        "isDynamicList": {
+          "type": "boolean",
+          "description": "Whether the list is populated dynamically from data source"
+        },
+        "uiMappingKeys": {
+          "type": "array",
+          "description": "Keys for data binding to component properties",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "themeColorConfig": {
+      "type": "object",
+      "description": "Theme-aware color configuration",
+      "properties": {
+        "darkTheme": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Hex color for dark theme"
+            },
+            {
+              "$ref": "#/definitions/nestedThemeColor"
+            }
+          ]
+        },
+        "lightTheme": {
+          "oneOf": [
+            {
+              "type": "string",
+              "description": "Hex color for light theme"
+            },
+            {
+              "$ref": "#/definitions/nestedThemeColor"
+            }
+          ]
+        }
+      },
+      "additionalProperties": true
+    },
+    "nestedThemeColor": {
+      "type": "object",
+      "description": "Nested theme color (for checkbox states)",
+      "properties": {
+        "darkTheme": {
+          "type": "string"
+        },
+        "lightTheme": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": true
+    },
+    "resourceName": {
+      "type": "string",
+      "description": "Name of the drawable resource (e.g. \"rectangle_border\")"
+    },
+    "resourceConfig": {
+      "type": "object",
+      "description": "Resource configuration for backgrounds, colors, images",
+      "additionalProperties": true,
+      "properties": {
+        "color": {
+          "$ref": "#/definitions/themeColorConfig",
+          "description": "Background color with theme support"
+        },
+        "background": {
+          "oneOf": [
+            {
+              "type": "object",
+              "description": "Background with color/drawable",
+              "properties": {
+                "color": {
+                  "$ref": "#/definitions/themeColorConfig"
+                },
+                "resourceName": {
+                  "$ref": "#/definitions/resourceName"
+                },
+                "tint": {
+                  "$ref": "#/definitions/themeColorConfig",
+                  "description": "Tint color for drawable"
+                },
+                "stroke": {
+                  "$ref": "#/definitions/strokeConfig"
+                }
+              }
+            }
+          ]
+        },
+        "image": {
+          "$ref": "#/definitions/imageResourceConfig",
+          "description": "Image resource configuration"
+        }
+      }
+    },
+    "strokeConfig": {
+      "type": "object",
+      "description": "Border/stroke configuration",
+      "properties": {
+        "width": {
+          "type": "integer",
+          "description": "Stroke width in dp"
+        },
+        "color": {
+          "$ref": "#/definitions/themeColorConfig",
+          "description": "Stroke color"
+        }
+      },
+      "additionalProperties": true
+    },
+    "imageResourceConfig": {
+      "type": "object",
+      "description": "Image resource configuration",
+      "properties": {
+        "offlineResource": {
+          "type": "object",
+          "description": "Offline/local resource configuration",
+          "properties": {
+            "resourceName": {
+              "$ref": "#/definitions/resourceName"
+            },
+            "tint": {
+              "$ref": "#/definitions/themeColorConfig",
+              "description": "Tint color for image"
+            },
+            "position": {
+              "type": "string",
+              "enum": [
+                "top",
+                "bottom",
+                "start",
+                "end"
+              ],
+              "description": "Position of image relative to text (for compound drawables)"
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "textConfig": {
+      "type": "object",
+      "description": "Configuration for Text components",
+      "additionalProperties": true,
+      "properties": {
+        "textValue": {
+          "type": "string",
+          "description": "Text content to display"
+        },
+        "textSize": {
+          "type": [
+            "string",
+            "integer"
+          ],
+          "description": "Text size in sp"
+        },
+        "textColor": {
+          "$ref": "#/definitions/themeColorConfig",
+          "description": "Text color with theme support"
+        },
+        "fontStyle": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "bold",
+            "italic"
+          ],
+          "description": "Font style"
+        },
+        "textAlign": {
+          "type": "string",
+          "enum": [
+            "start",
+            "center",
+            "end",
+            "vertical"
+          ],
+          "description": "Text alignment"
+        },
+        "textDecoration": {
+          "type": "string",
+          "enum": [
+            "none",
+            "underline",
+            "strikethrough"
+          ],
+          "description": "Text decoration style"
+        },
+        "lineSpacing": {
+          "type": [
+            "string",
+            "number"
+          ],
+          "description": "Line spacing multiplier"
+        }
+      }
+    },
+    "buttonConfig": {
+      "type": "object",
+      "description": "Configuration for Button components",
+      "additionalProperties": true,
+      "properties": {
+        "textValue": {
+          "type": "string",
+          "description": "Button text"
+        },
+        "textColor": {
+          "$ref": "#/definitions/themeColorConfig",
+          "description": "Button text color"
+        },
+        "textAlign": {
+          "type": "string",
+          "enum": [
+            "start",
+            "center",
+            "end",
+            "vertical"
+          ],
+          "description": "Text alignment within button"
+        },
+        "fontStyle": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "bold",
+            "italic"
+          ],
+          "description": "Button text font style"
+        }
+      }
+    },
+    "fabConfig": {
+      "type": "object",
+      "description": "Configuration for FloatingButton components",
+      "additionalProperties": true,
+      "properties": {
+        "backgroundColor": {
+          "$ref": "#/definitions/themeColorConfig",
+          "description": "FAB background color"
+        },
+        "size": {
+          "type": "string",
+          "enum": [
+            "normal",
+            "mini",
+            "auto"
+          ],
+          "description": "FAB size variant"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Icon resource name for FAB"
+        },
+        "iconTint": {
+          "$ref": "#/definitions/themeColorConfig",
+          "description": "Icon tint color"
+        }
+      }
+    },
+    "listConfig": {
+      "type": "object",
+      "description": "Configuration for List/RecyclerView components",
+      "additionalProperties": true,
+      "properties": {
+        "layoutManager": {
+          "type": "string",
+          "enum": [
+            "linear",
+            "grid",
+            "staggered"
+          ],
+          "description": "Type of layout manager"
+        },
+        "orientation": {
+          "type": "integer",
+          "enum": [
+            0,
+            1
+          ],
+          "description": "List orientation: 0=horizontal, 1=vertical"
+        },
+        "spanCount": {
+          "type": "integer",
+          "description": "Number of columns for grid layout"
+        }
+      }
+    },
+    "switchConfig": {
+      "type": "object",
+      "description": "Configuration for Switch components",
+      "properties": {
+        "isChecked": {
+          "type": "boolean",
+          "description": "Initial checked state"
+        }
+      },
+      "additionalProperties": true
+    },
+    "titleConfig": {
+      "type": "object",
+      "description": "Toolbar title configuration",
+      "properties": {
+        "color": {
+          "$ref": "#/definitions/themeColorConfig",
+          "description": "Title text color"
+        },
+        "value": {
+          "type": "string",
+          "description": "Title text"
+        }
+      },
+      "additionalProperties": true
+    },
+    "navigationIconConfig": {
+      "type": "object",
+      "description": "Toolbar navigation icon configuration",
+      "properties": {
+        "color": {
+          "$ref": "#/definitions/themeColorConfig",
+          "description": "Icon tint color"
+        },
+        "value": {
+          "type": "string",
+          "description": "Icon resource name"
+        }
+      },
+      "additionalProperties": true
+    },
+    "menuItemConfig": {
+      "type": "object",
+      "description": "Toolbar menu item configuration",
+      "properties": {
+        "menuId": {
+          "type": "integer",
+          "description": "Unique menu item ID"
+        },
+        "title": {
+          "type": "string",
+          "description": "Menu item title"
+        },
+        "icon": {
+          "type": "string",
+          "description": "Menu item icon resource"
+        },
+        "color": {
+          "$ref": "#/definitions/themeColorConfig",
+          "description": "Menu item icon color"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/eventModel"
+          }
+        },
+        "startToParent": {
+          "type": "object"
+        },
+        "topToParent": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": true
+    },
+    "eventModel": {
+      "type": "object",
+      "description": "Event handler configuration",
+      "properties": {
+        "name": {
+          "type": "string",
+          "enum": [
+            "OnClick",
+            "OnLongClick",
+            "OnViewStatesCreated",
+            "OnValueChange",
+            "OnMenuItemClick",
+            "OnTextChanged",
+            "OnFocusChange"
+          ],
+          "description": "Event type"
+        },
+        "action": {
+          "type": "string",
+          "description": "Action handler name to invoke (e.g., 'navigateToFeature', 'syncOfflineData')"
+        },
+        "navigationAction": {
+          "type": "boolean",
+          "description": "Whether this event triggers navigation"
+        },
+        "eventInfo": {
+          "type": "object",
+          "description": "Additional event information",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "examples": [
+    {
+      "appId": 1,
+      "screenId": 1,
+      "container": {
+        "componentId": 1,
+        "componentName": "Root",
+        "componentType": "ConstraintView",
+        "config": {
+          "width": "match_parent",
+          "height": "match_parent"
+        },
+        "components": [
+          {
+            "componentId": 2,
+            "componentName": "Title",
+            "componentType": "Text",
+            "config": {
+              "width": "wrap_content",
+              "height": "wrap_content",
+              "startToParent": {
+                "margin": 16
+              },
+              "endToParent": {
+                "margin": 16
+              },
+              "topToParent": {
+                "margin": 24
+              },
+              "textConfig": {
+                "textValue": "Sample",
+                "textColor": {
+                  "darkTheme": "#FFFFFF",
+                  "lightTheme": "#000000"
+                }
+              }
+            }
+          },
+          {
+            "componentId": 3,
+            "componentName": "Action",
+            "componentType": "Button",
+            "config": {
+              "width": "wrap_content",
+              "height": "wrap_content",
+              "startToParent": {
+                "margin": 16
+              },
+              "endToParent": {
+                "margin": 16
+              },
+              "topToBottomOf": {
+                "viewStateId": "2",
+                "margin": 16
+              },
+              "buttonConfig": {
+                "textValue": "Button",
+                "textColor": {
+                  "darkTheme": "#FFFFFF"
+                }
+              },
+              "resource": {
+                "background": {
+                  "color": {
+                    "darkTheme": "#00518D"
+                  }
+                }
+              }
+            },
+            "events": [
+              {
+                "name": "OnClick",
+                "action": "onSubmit"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
+

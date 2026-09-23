@@ -1,0 +1,26 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Generated indexes, caches, visualisations, and run output
+context/
+chroma_db/
+lightrag_storage/
+.agentfs_local/
+output/
+*.html
+
+# A duplicate embedded checkout exists locally; do not publish it as a gitlink.
+Hybrid_RAG/
